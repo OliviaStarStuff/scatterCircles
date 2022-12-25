@@ -17,7 +17,7 @@ body > * {
     font-family: sans-serif;
 }
 header {
-    margin: 1rem 0 0.2rem 0;
+    margin: 0.5rem 0 0.2rem 0;
 }
 
 canvas {
@@ -44,6 +44,16 @@ section {
 
 #details {
     margin: 0.5rem 0rem;
+    display: flex;
+    /* height: 100px; */
+    flex-wrap: warp;
+    column-gap: 1em;
+    justify-content: space-around;
+    align-items: center;
+}
+
+textarea {
+    resize:none;
 }
 
 #details > h2 {

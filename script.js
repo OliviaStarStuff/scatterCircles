@@ -90,29 +90,50 @@ box.addEventListener("mousemove", (e) => {
     }
 });
 
-document.addEventListener("keypress", (e) => {
+let randomTextColour = false;
+let textColour = "white"
+
+box.addEventListener("keypress", (e) => {
     if (e.key == "q") {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.globalCompositeOperation = "destination-over"
         state = false;
 
         output.textContent = "normal";
+        output.style.colour = "black";
+        output.style.fontWeight = "400";
 
     } else if (e.key == "w") {
         drawText();
+        output.textContent = "normal";
+        output.style.colour = "black";
+        output.style.fontWeight = "400";
 
     } else if (e.key == "e") {
         state = true;
         ctx.globalCompositeOperation = "source-atop";
         output.textContent = "clipped";
+        output.style.fontWeight = "600";
+        output.style.color = "darkred";
+
     } else if(e.key == "r") {
         state = true
         ctx.globalCompositeOperation = "destination-over"
         output.textContent = "under";
+        output.style.colour = "blue";
+
+        output.style.fontWeight = "600";
     } else if (e.key == "t" && state) {
         state = false
         ctx.globalCompositeOperation = "source-over";
         output.textContent = "normal";
+        output.style.colour = "black";
+
+        output.style.fontWeight = "400";
+    } else if (e.key == "f") {
+        randomTextColour = true;
+    } else if (e.key == "g") {
+        randomTextColour = false;
     }
 
 
@@ -136,12 +157,57 @@ f.load().then(() => {
 
 let state = false;
 
+const input = document.getElementById("input");
+
+let inputText = input.textContent.split(" ");
+
+
+
 function drawText() {
     ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = "white"
-    ctx.fillText("I Will", 120, 200);
-    ctx.fillText(" Feed You", -30, 300);
-    ctx.fillText("When I", 150, 400);
-    ctx.fillText(" finish", 50, 500);
-    ctx.fillText(" coding", 50, 600);
+    console.log("drawing", inputText)
+    ctx.fillStyle = randomTextColour ? randomRGBA() : textColour;
+
+    let line = ""
+    let i=0;
+    let measure = 0;
+    for(let ch in inputText) {
+        if (measure.width > 450) {
+            ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 150+100*i);
+            line = "";
+            i++;
+        }
+
+        line += " " + inputText[ch];
+        if(inputText[ch-1] == " ") {
+
+        }
+        measure = ctx.measureText(line);
+    }
+    if (line.length > 0) {
+        ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 200+100*i);
+    }
+
 }
+
+const download = document.getElementById("download")
+
+download.addEventListener('click', function (e) {
+    const link = document.createElement('a');
+    link.download = 'drawing.png';
+    link.href = canvas.toDataURL();
+    link.click();
+    link.delete;
+  });
+
+
+  input.addEventListener("change", (e) => {
+    inputText = document.getElementById("input").value.split(" ");
+    drawText();
+  })
+
+  input.addEventListener("keypress", (e) => {
+    if(e.key == "Enter") {
+        input.blur();
+    }
+});
