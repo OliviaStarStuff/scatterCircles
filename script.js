@@ -5,45 +5,52 @@ import { randomRGBA } from "./randomrgb.js";
 const canvas = document.getElementById("testCanvas");
 const ctx = canvas.getContext("2d");
 
-const box = document.getElementById("canvas")
+const box = document.getElementById("canvas");
 const output = document.getElementById("output");
 const input = document.getElementById("input");
+const textSizeOutput = document.getElementById("textSizeOutput");
+const textSizeInput = document.getElementById("textSizeInput");
+
 
 const download = document.getElementById("download")
 
 let isDrawing = false;
 let lastM = {x:0, y:0};
 let randomTextColour = false;
-const textColour = "white"
+let textColour = "white";
 let state = false;
 let inputText = input.textContent.split(" ");
+
+let lines = [];
+let height = ctx.measureText(inputText[0]).actualBoundingBoxAscent;
+let textYStart = 0;
+let textSpacing = 0;
 
 let f = new FontFace("rubik", "url(https://fonts.gstatic.com/s/rubikmonoone/v14/UqyJK8kPP3hjw6ANTdfRk9YSN983TKU.woff2)");
 f.load().then(() => {
     document.fonts.add(f);
-    ctx.font = "bold 100px rubik";
-    CanvasRenderingContext2D.textBaseline = "alphabetic"
+    ctx.font = "bold 72px rubik";
+    CanvasRenderingContext2D.textBaseline = "alphabetic";
     changeText();
     writeText();
     clipText();
 });
 
-let lines = []
-let height = ctx.measureText(inputText[0]).actualBoundingBoxAscent;
+
 
 function changeText(e) {
-    output.textContent = "text updated"
+    output.textContent = "text updated";
     inputText = input.value.split(" ");
-    lines = []
+    lines = [];
     height = ctx.measureText(inputText[0]).actualBoundingBoxAscent;
-    let line = []
+    let line = [];
     let i=0;
     let width = 0;
 
     for(const word of inputText) {
         line.push(word);
         width = ctx.measureText(line.join(' ')).width;
-        if(line.length > 1 && width > 800) {
+        if(line.length > 1 && width > 790) {
             lines.push(line.slice(0, line.length-1).join(" "));
             line = [word];
             width = ctx.measureText(line.join(' ')).width;
@@ -57,23 +64,31 @@ function changeText(e) {
         }
     }
     if (line.length > 0) lines.push(line.join(' '));
+    textYStart = (canvas.height - lines.length * height)/(lines.length+1)
+    textSpacing = textYStart > height ? height*2 : textYStart + height;
+    textYStart = textYStart > height ? (canvas.height - (textSpacing * lines.length))/2 : textYStart;
 }
 
-function drawText() {
+function styleText() {
     ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = randomTextColour ? randomRGBA() : textColour;
-    ctx.textAlign = "center"
+    ctx.textAlign = "center";
+}
 
-
-    let start = (canvas.height - lines.length * height)/(lines.length+1)
-    let spacing = start > height ? height*2 : start + height;
-    // let spacing = start;
+function drawText(stroke=false) {
     for(let i in lines) {
-        ctx.fillText(lines[i], canvas.width/2, i*(spacing)+start + height)
+        if (!stroke) {
+            console.log("filling")
+            ctx.fillText(lines[i], canvas.width/2, i*(textSpacing)+textYStart + height)
+        } else {
+            console.log("stroking")
+            ctx.strokeText(lines[i], canvas.width/2, i*(textSpacing)+textYStart + height)
+        }
     }
 }
 
 function writeText() {
+    styleText();
     drawText();
     output.textContent = "normal";
     output.style.colour = "black";
@@ -228,9 +243,35 @@ download.addEventListener('click', function (e) {
 
 input.addEventListener("input", (e) => {
     output.textContent = "modifying text";
+    previewText();
 });
 
 input.addEventListener("change", (e) => {
+    clearCanvas();
+    changeText();
+    writeText();
+    clipText();
+})
+
+textSizeInput.addEventListener("input", (e) => {
+    textSizeOutput.textContent = textSizeInput.value+"px";
+    ctx.font =`bold ${textSizeOutput.textContent} rubik`;
+    previewText();
+})
+
+function previewText() {
+    // ctx.strokeStyle = "#00000055"
+    ctx.lineWidth = 0.1;
+    ctx.setLineDash([20, 5]);
+    clearCanvas();
+    changeText();
+    drawText(true);
+}
+
+textSizeInput.addEventListener("change", (e) => {
+    textSizeOutput.textContent = textSizeInput.value+"px";
+    ctx.font =`bold ${textSizeOutput.textContent} rubik`;
+    textColour = "white"
     clearCanvas();
     changeText();
     writeText();

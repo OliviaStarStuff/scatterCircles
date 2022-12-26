@@ -75,6 +75,10 @@ canvas {
     width: 15ch;
 }
 
+#textSizeOutput {
+    width: 5ch;
+}
+
 textarea#input {
     min-width: 50%;
     resize:none;
