@@ -268,7 +268,17 @@ function previewText() {
     drawText(true);
 }
 
-textSizeInput.addEventListener("change", (e) => {
+textSizeInput.addEventListener("mouseup", (e) => {
+    textSizeOutput.textContent = textSizeInput.value+"px";
+    ctx.font =`bold ${textSizeOutput.textContent} rubik`;
+    textColour = "white"
+    clearCanvas();
+    changeText();
+    writeText();
+    clipText();
+})
+
+textSizeInput.addEventListener("touchend", (e) => {
     textSizeOutput.textContent = textSizeInput.value+"px";
     ctx.font =`bold ${textSizeOutput.textContent} rubik`;
     textColour = "white"
