@@ -18,33 +18,49 @@ const textColour = "white"
 let state = false;
 let inputText = input.textContent.split(" ");
 
-let f = new FontFace("test", "url(https://fonts.gstatic.com/s/rubikmonoone/v14/UqyJK8kPP3hjw6ANTdfRk9YSN983TKU.woff2)");
+let f = new FontFace("rubik", "url(https://fonts.gstatic.com/s/rubikmonoone/v14/UqyJK8kPP3hjw6ANTdfRk9YSN983TKU.woff2)");
 f.load().then(() => {
     document.fonts.add(f);
-    ctx.font = "bold 100px test";
+    ctx.font = "bold 100px rubik";
+    CanvasRenderingContext2D.textBaseline = "alphabetic"
+    writeText();
+    clipText();
 });
-
-
 
 function drawText() {
     ctx.globalCompositeOperation = "source-over";
     console.log("drawing", inputText)
     ctx.fillStyle = randomTextColour ? randomRGBA() : textColour;
-
-    let line = ""
+    ctx.textAlign = "center"
+    let line = []
     let i=0;
-    let measure = 0;
-    for(let ch in inputText) {
-        if (measure.width > 440) {
-            ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 150+100*i);
-            line = "";
+    let width = 0;
+    let lines = []
+    let height = ctx.measureText(inputText[0]).actualBoundingBoxAscent;
+    console.log(ctx.measureText(inputText[0]))
+    console.log(inputText)
+    for(const word of inputText) {
+        line.push(word);
+        width = ctx.measureText(line.join(' ')).width;
+        if(line.length > 1 && width > 800) {
+            lines.push(line.slice(0, line.length-1).join(" "));
+            line = [word];
+            width = ctx.measureText(line.join(' ')).width;
+            console.log(width)
             i++;
         }
-        line += " " + inputText[ch];
-        measure = ctx.measureText(line);
+
+        if (width > 795) {
+            lines.push(line.join(" "));
+            line = [];
+            i++;
+        }
     }
-    if (line.length > 0) {
-        ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 150+100*i);
+    if (line.length > 0) lines.push(line.join(' '));
+    let spacing = (canvas.height - lines.length * height)/(lines.length+1) + height
+    for(let i in lines) {
+        console.log(lines[i], i*(spacing+height)+spacing, height)
+        ctx.fillText(lines[i], canvas.width/2, i*(spacing)+spacing)
     }
 }
 
@@ -69,6 +85,7 @@ function writeUnderText() {
     output.textContent = "under";
     output.style.colour = "blue";
     output.style.fontWeight = "600";
+    // transparency = 0.2;
 }
 
 function resetState() {
@@ -77,6 +94,7 @@ function resetState() {
     output.textContent = "normal";
     output.style.colour = "black";
     output.style.fontWeight = "400";
+    transparency = 1;
 }
 
 function clearCanvas() {
@@ -90,6 +108,8 @@ function getMouesPosition(e) {
     return {x: mX, y: mY};
 }
 
+let transparency = 1;
+
 function drawCircles(m, i) {
     let offsetX = 0;
     let offsetY = 0;
@@ -99,7 +119,7 @@ function drawCircles(m, i) {
     radius = Math.random() * 30 + 5;
     ctx.beginPath();
     ctx.arc(m.x+offsetX, m.y+offsetY, radius, 0, Math.PI*2)
-    ctx.fillStyle = randomRGBA();
+    ctx.fillStyle = randomRGBA(transparency)
     ctx.fill();
 
     let requestId = requestAnimationFrame(() => {
@@ -196,15 +216,20 @@ download.addEventListener('click', function (e) {
   });
 
 
-  input.addEventListener("change", (e) => {
-    inputText = document.getElementById("input").value.split(" ");
-    drawText();
-  })
+input.addEventListener("input", (e) => {
+    output.textContent = "modifying text"
+});
 
-  input.addEventListener("keypress", (e) => {
+input.addEventListener("change", (e) => {
+    inputText = document.getElementById("input").value.split(" ");
+    output.textContent = "text updated"
+})
+
+input.addEventListener("keypress", (e) => {
     if(e.key == "Enter") {
         input.blur();
     }
+    e.stopImmediatePropagation();
 });
 // let image;
 // window.addEventListener("resize", (e) => {
