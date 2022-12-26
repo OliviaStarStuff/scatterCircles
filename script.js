@@ -172,22 +172,18 @@ function drawText() {
     let i=0;
     let measure = 0;
     for(let ch in inputText) {
-        if (measure.width > 450) {
+        if (measure.width > 440) {
             ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 150+100*i);
             line = "";
             i++;
         }
 
         line += " " + inputText[ch];
-        if(inputText[ch-1] == " ") {
-
-        }
         measure = ctx.measureText(line);
     }
     if (line.length > 0) {
-        ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 200+100*i);
+        ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 150+100*i);
     }
-
 }
 
 const download = document.getElementById("download")
