@@ -35,7 +35,7 @@ section {
 
 #canvas > p {
 
-    border-radius: 20px 0px 0px 0px;
+    border-radius: 20px 20px 0px 0px;
     user-select: none;
     background-color: white;
     position:absolute;
@@ -43,20 +43,26 @@ section {
 }
 
 #details {
-    margin: 0.5rem 0rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
     display: flex;
     /* height: 100px; */
-    flex-wrap: warp;
+    flex-wrap: wrap;
     column-gap: 1em;
     justify-content: space-around;
     align-items: center;
 }
 
+#details > * {
+    margin-bottom: 0.5rem;
+}
+
 textarea {
     resize:none;
+
+    box-sizing: border-box;
 }
 
 #details > h2 {
-    margin: 0rem 0rem 0.5rem 0rem;
+    margin: 0rem 1rem 0.5rem 1rem;
 }
-

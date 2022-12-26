@@ -211,3 +211,22 @@ download.addEventListener('click', function (e) {
         input.blur();
     }
 });
+// let image;
+// window.addEventListener("resize", (e) => {
+//     if(image == null) {
+//         image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+//     }
+//     if (window.innerWidth < 832) {
+//         canvas.width = window.innerWidth - 2 * 16;
+//         ctx.clearRect(0,0,canvas.width,canvas.height)
+//         ctx.putImageData(image, 0, 0);
+//         ctx.font = "bold 100px test";
+//     } else {
+//         canvas.width = 800;
+
+//         ctx.clearRect(0,0,canvas.width,canvas.height)
+//         ctx.putImageData(image, 0, 0);
+//         ctx.font = "bold 100px test";
+//     }
+
+// })
