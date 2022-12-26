@@ -83,6 +83,7 @@ textarea#input {
     min-width: 50%;
     resize:none;
     box-sizing: border-box;
+    border-radius: 3px;
 }
 
 #details > h2 {
