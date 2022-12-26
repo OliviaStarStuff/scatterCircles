@@ -3,18 +3,92 @@
 import { randomRGBA } from "./randomrgb.js";
 
 const canvas = document.getElementById("testCanvas");
-const box = document.getElementById("canvas")
 const ctx = canvas.getContext("2d");
+
+const box = document.getElementById("canvas")
 const output = document.getElementById("output");
+const input = document.getElementById("input");
+
+const download = document.getElementById("download")
+
+let isDrawing = false;
+let lastM = {x:0, y:0};
+let randomTextColour = false;
+const textColour = "white"
+let state = false;
+let inputText = input.textContent.split(" ");
+
+let f = new FontFace("test", "url(https://fonts.gstatic.com/s/rubikmonoone/v14/UqyJK8kPP3hjw6ANTdfRk9YSN983TKU.woff2)");
+f.load().then(() => {
+    document.fonts.add(f);
+    ctx.font = "bold 100px test";
+});
+
+
+
+function drawText() {
+    ctx.globalCompositeOperation = "source-over";
+    console.log("drawing", inputText)
+    ctx.fillStyle = randomTextColour ? randomRGBA() : textColour;
+
+    let line = ""
+    let i=0;
+    let measure = 0;
+    for(let ch in inputText) {
+        if (measure.width > 440) {
+            ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 150+100*i);
+            line = "";
+            i++;
+        }
+        line += " " + inputText[ch];
+        measure = ctx.measureText(line);
+    }
+    if (line.length > 0) {
+        ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 150+100*i);
+    }
+}
+
+function writeText() {
+    drawText();
+    output.textContent = "normal";
+    output.style.colour = "black";
+    output.style.fontWeight = "400";
+}
+
+function clipText() {
+    state = true;
+    ctx.globalCompositeOperation = "source-atop";
+    output.textContent = "clipped";
+    output.style.fontWeight = "600";
+    output.style.color = "darkred";
+}
+
+function writeUnderText() {
+    state = true
+    ctx.globalCompositeOperation = "destination-over"
+    output.textContent = "under";
+    output.style.colour = "blue";
+    output.style.fontWeight = "600";
+}
+
+function resetState() {
+    ctx.globalCompositeOperation = "source-over";
+    state = false
+    output.textContent = "normal";
+    output.style.colour = "black";
+    output.style.fontWeight = "400";
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    resetState();
+}
 
 function getMouesPosition(e) {
     const mX = e.offsetX * canvas.width / canvas.scrollWidth | 0;
     const mY = e.offsetY * canvas.height / canvas.scrollWidth | 0;
     return {x: mX, y: mY};
 }
-
-let isDrawing = false;
-let lastM = {x:0, y:0};
 
 function drawCircles(m, i) {
     let offsetX = 0;
@@ -90,55 +164,20 @@ box.addEventListener("mousemove", (e) => {
     }
 });
 
-let randomTextColour = false;
-let textColour = "white"
+document.getElementById("clip").addEventListener("click", clipText);
+document.getElementById("write").addEventListener("click", writeText);
+document.getElementById("reset").addEventListener("click", resetState);
+document.getElementById("clear").addEventListener("click", clearCanvas);
+document.getElementById("under").addEventListener("click", writeUnderText);
 
-box.addEventListener("keypress", (e) => {
-    if (e.key == "q") {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.globalCompositeOperation = "destination-over"
-        state = false;
-
-        output.textContent = "normal";
-        output.style.colour = "black";
-        output.style.fontWeight = "400";
-
-    } else if (e.key == "w") {
-        drawText();
-        output.textContent = "normal";
-        output.style.colour = "black";
-        output.style.fontWeight = "400";
-
-    } else if (e.key == "e") {
-        state = true;
-        ctx.globalCompositeOperation = "source-atop";
-        output.textContent = "clipped";
-        output.style.fontWeight = "600";
-        output.style.color = "darkred";
-
-    } else if(e.key == "r") {
-        state = true
-        ctx.globalCompositeOperation = "destination-over"
-        output.textContent = "under";
-        output.style.colour = "blue";
-
-        output.style.fontWeight = "600";
-    } else if (e.key == "t" && state) {
-        state = false
-        ctx.globalCompositeOperation = "source-over";
-        output.textContent = "normal";
-        output.style.colour = "black";
-
-        output.style.fontWeight = "400";
-    } else if (e.key == "f") {
-        randomTextColour = true;
-    } else if (e.key == "g") {
-        randomTextColour = false;
-    }
-
-
-
-
+document.addEventListener("keypress", (e) => {
+    if (e.key == "q") clearCanvas();
+    else if (e.key == "w") writeText();
+    else if (e.key == "e") clipText();
+    else if(e.key == "r") writeUnderText();
+    else if (e.key == "t" && state) resetState();
+    else if (e.key == "f") randomTextColour = true;
+    else if (e.key == "g") randomTextColour = false;
 });
 
 box.addEventListener("mouseup", (e) => {
@@ -147,46 +186,6 @@ box.addEventListener("mouseup", (e) => {
         isDrawing = false;
     }
 });
-
-
-let f = new FontFace("test", "url(https://fonts.gstatic.com/s/rubikmonoone/v14/UqyJK8kPP3hjw6ANTdfRk9YSN983TKU.woff2)");
-f.load().then(() => {
-    document.fonts.add(f);
-    ctx.font = "bold 100px test";
-});
-
-let state = false;
-
-const input = document.getElementById("input");
-
-let inputText = input.textContent.split(" ");
-
-
-
-function drawText() {
-    ctx.globalCompositeOperation = "source-over";
-    console.log("drawing", inputText)
-    ctx.fillStyle = randomTextColour ? randomRGBA() : textColour;
-
-    let line = ""
-    let i=0;
-    let measure = 0;
-    for(let ch in inputText) {
-        if (measure.width > 440) {
-            ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 150+100*i);
-            line = "";
-            i++;
-        }
-
-        line += " " + inputText[ch];
-        measure = ctx.measureText(line);
-    }
-    if (line.length > 0) {
-        ctx.fillText(line, (canvas.width-measure.width+measure.actualBoundingBoxLeft)/2 , 150+100*i);
-    }
-}
-
-const download = document.getElementById("download")
 
 download.addEventListener('click', function (e) {
     const link = document.createElement('a');

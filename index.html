@@ -14,15 +14,21 @@
             <h1>Scatter Circles</h1>
         </header>
         <main>
-            <section id="canvas" tabindex="1">
-                <p>left click to draw, q: clear, w: write, e:clipped, r:draw under, f:randomColour, g:white</p>
+            <section id="canvas">
+                <p id="instructions ">left click to draw, q: clear, w: write, e:clipped, r:draw under, f:randomColour, g:white</p>
                 <canvas height="780" width="800" id="testCanvas">drawing toy</canvas>
             </section>
             <section id="details">
-                <h2>Draw State</h2>
                 <p id="output">normal</p>
                 <button id="download">download</button>
-                <textarea id="input" width="100" height="50" resize>I will feed you when i finish coding</textarea>
+                <button id="write">write</button>
+                <button id="clip">clip</button>
+                <button id="under">under</button>
+                <button id="clear">clear</button>
+                <button id="reset">reset</button>
+            </section>
+            <section id="textbox"> <h3>Text to Draw</h3>
+                <textarea id="input">I will feed you when i finish coding</textarea>
             </section>
         </main>
     </body>
