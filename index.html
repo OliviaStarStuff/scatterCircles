@@ -15,21 +15,23 @@
         </header>
         <main>
             <section id="canvas">
-                <p id="instructions ">left click to draw, q: clear, w: write, e:clipped, r:draw under, f:randomColour, g:white</p>
+                <!-- <p id="instructions">left click to draw, q: clear, w: write, e:clipped, r:draw under, f:randomColour, g:white</p> -->
+                <p id="output">normal</p>
                 <canvas height="780" width="800" id="testCanvas">drawing toy</canvas>
             </section>
             <section id="details">
-                <p id="output">normal</p>
                 <button id="download">download</button>
-                <button id="write">write</button>
-                <button id="clip">clip</button>
-                <button id="under">under</button>
-                <button id="clear">clear</button>
-                <button id="reset">reset</button>
+                <button id="write">write:W</button>
+                <button id="clip">clip:E</button>
+                <button id="under">under:R</button>
+                <button id="clear">clear:Q</button>
+                <button id="reset">reset:T</button>
             </section>
-            <section id="textbox"> <h3>Text to Draw</h3>
-                <p id="textSizeOutput">72px</p>
-                <input id="textSizeInput" type="range" min="24" max="150" value="72" class="slider" id="myRange">
+            <section id="textbox"> <h3>Settings</h3>
+                <div id="textsize">
+                    <label for="textSizeInput" id="textSizeOutput">72px</label>
+                    <input id="textSizeInput" type="range" min="24" max="150" value="72" class="slider" id="myRange">
+                </div>
                 <textarea id="input">I will feed you when i finish coding</textarea>
             </section>
         </main>

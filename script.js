@@ -100,7 +100,7 @@ function clipText() {
     ctx.globalCompositeOperation = "source-atop";
     output.textContent = "clipped";
     output.style.fontWeight = "600";
-    output.style.color = "darkred";
+    output.style.color = "red";
 
 }
 
