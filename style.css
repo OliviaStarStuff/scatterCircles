@@ -21,7 +21,6 @@ header {
 }
 
 canvas {
-
     border-radius: 20px;
     background-color: white;
     width: 100%;
@@ -59,7 +58,6 @@ section {
 
 textarea {
     resize:none;
-
     box-sizing: border-box;
 }
 
