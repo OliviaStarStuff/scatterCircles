@@ -23,22 +23,23 @@ f.load().then(() => {
     document.fonts.add(f);
     ctx.font = "bold 100px rubik";
     CanvasRenderingContext2D.textBaseline = "alphabetic"
+    changeText();
     writeText();
     clipText();
 });
 
-function drawText() {
-    ctx.globalCompositeOperation = "source-over";
-    console.log("drawing", inputText)
-    ctx.fillStyle = randomTextColour ? randomRGBA() : textColour;
-    ctx.textAlign = "center"
+let lines = []
+let height = ctx.measureText(inputText[0]).actualBoundingBoxAscent;
+
+function changeText(e) {
+    output.textContent = "text updated"
+    inputText = input.value.split(" ");
+    lines = []
+    height = ctx.measureText(inputText[0]).actualBoundingBoxAscent;
     let line = []
     let i=0;
     let width = 0;
-    let lines = []
-    let height = ctx.measureText(inputText[0]).actualBoundingBoxAscent;
-    console.log(ctx.measureText(inputText[0]))
-    console.log(inputText)
+
     for(const word of inputText) {
         line.push(word);
         width = ctx.measureText(line.join(' ')).width;
@@ -46,7 +47,6 @@ function drawText() {
             lines.push(line.slice(0, line.length-1).join(" "));
             line = [word];
             width = ctx.measureText(line.join(' ')).width;
-            console.log(width)
             i++;
         }
 
@@ -57,10 +57,19 @@ function drawText() {
         }
     }
     if (line.length > 0) lines.push(line.join(' '));
-    let spacing = (canvas.height - lines.length * height)/(lines.length+1) + height
+}
+
+function drawText() {
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = randomTextColour ? randomRGBA() : textColour;
+    ctx.textAlign = "center"
+
+
+    let start = (canvas.height - lines.length * height)/(lines.length+1)
+    let spacing = start > height ? height*2 : start + height;
+    // let spacing = start;
     for(let i in lines) {
-        console.log(lines[i], i*(spacing+height)+spacing, height)
-        ctx.fillText(lines[i], canvas.width/2, i*(spacing)+spacing)
+        ctx.fillText(lines[i], canvas.width/2, i*(spacing)+start + height)
     }
 }
 
@@ -77,6 +86,7 @@ function clipText() {
     output.textContent = "clipped";
     output.style.fontWeight = "600";
     output.style.color = "darkred";
+
 }
 
 function writeUnderText() {
@@ -217,12 +227,14 @@ download.addEventListener('click', function (e) {
 
 
 input.addEventListener("input", (e) => {
-    output.textContent = "modifying text"
+    output.textContent = "modifying text";
 });
 
 input.addEventListener("change", (e) => {
-    inputText = document.getElementById("input").value.split(" ");
-    output.textContent = "text updated"
+    clearCanvas();
+    changeText();
+    writeText();
+    clipText();
 })
 
 input.addEventListener("keypress", (e) => {
