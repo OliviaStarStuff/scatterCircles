@@ -20,11 +20,11 @@ function randomRGB() {
     return "rgb(" + generateRGB() + ")";
 }
 
-export function randomRGBA() {
-    return "rgba(" + generateRGB() + ", " + randomAlpha() + ")";
+export function randomRGBA(alphaMax, alphaMin) {
+    return "rgba(" + generateRGB() + ", " + randomAlpha(alphaMax, alphaMin) + ")";
 }
 
-function randomAlpha(min = 0, max = 1) {
+function randomAlpha(max = 1, min = 0) {
     if (min == 0 && max == 1) {
         return Math.random();
     }
