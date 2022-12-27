@@ -59,68 +59,57 @@ section {
     justify-content: space-around;
 }
 
-#canvas {
+#canvas-section {
     max-width: 800px;
 }
 
-canvas {
+#main-canvas {
     border-radius: 20px;
     background-color: white;
-    width: 100%;
+    width: 800px;
+    height: 800px;
     box-sizing: border-box;
 }
 
-#textsize {
+#text-size-container {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-#canvas > p {
+#canvas-section > p {
     user-select: none;
     position:absolute;
 }
 
-#output {
+#button-section {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    align-items: center;
+}
+
+#state-output {
     text-align: right;
     bottom: 1em;
     right: 1em;
 }
 
-#output::before {
-    content: "Draw State: ";
-    text-transform: none;
-}
-
-#instructions:hover {
-    background-color: white;
-}
-
-#details {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
 
 
-    align-items: center;
-}
-
-#details > * {
+#button-section > button {
     margin-bottom: 0.5rem;
 }
 
-#textSizeOutput {
+#text-size-label {
     width: 5ch;
 }
 
-textarea#input {
+#text-input {
     min-width: 50%;
     resize:none;
     box-sizing: border-box;
     border-radius: 3px;
-}
-
-#details > h2 {
-    margin: 0rem 1rem 0.5rem 1rem;
+    display: none;
 }
 
 @media screen and (min-width:1200px) {
@@ -135,18 +124,23 @@ textarea#input {
     section {
         flex-direction: column;
     }
-    #canvas {
+    #canvas-section {
         grid-area: a;
     }
 
-    #details {
+    #button-section {
         grid-area: b;
     }
 
-    #textbox {
+    #text-input {
+        min-width: unset;
+        max-width: 18ch;
+    }
+
+    #text-settings {
         grid-area: c;
         justify-content: flex-start;
     }
-    #input {
+    #text-input {
         height:70%   }
 }

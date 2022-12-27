@@ -2,30 +2,32 @@
 
 import { randomRGBA } from "./randomrgb.js";
 
-const canvas = document.getElementById("testCanvas");
+const canvas = document.getElementById("main-canvas");
 const ctx = canvas.getContext("2d");
 
-const box = document.getElementById("canvas");
-const output = document.getElementById("output");
-const input = document.getElementById("input");
-const textSizeOutput = document.getElementById("textSizeOutput");
-const textSizeInput = document.getElementById("textSizeInput");
-
-
-const download = document.getElementById("download")
+const canvasSection = document.getElementById("canvas-section");
+const stateOutput = document.getElementById("state-output");
+const textInput = document.getElementById("text-input");
+const textSizeLabel = document.getElementById("text-size-label");
+const textSizeInput = document.getElementById("text-size-input");
+const download = document.getElementById("download-btn")
+const checkbox = document.getElementById("checkbox");
 
 let isDrawing = false;
 let lastM = {x:0, y:0};
 let randomTextColour = false;
 let textColour = "white";
 let state = false;
-let inputText = input.textContent.split(" ");
 
-let lines = [];
+let inputText = textInput.textContent.split(" ");
 let height = ctx.measureText(inputText[0]).actualBoundingBoxAscent;
-let textYStart = 0;
+let lines = [];
+let textPosY = 0;
 let textSpacing = 0;
 
+let transparency = 1;
+
+//impoert Font Face
 let f = new FontFace("rubik", "url(https://fonts.gstatic.com/s/rubikmonoone/v14/UqyJK8kPP3hjw6ANTdfRk9YSN983TKU.woff2)");
 f.load().then(() => {
     document.fonts.add(f);
@@ -36,11 +38,9 @@ f.load().then(() => {
     clipText();
 });
 
-
-
-function changeText(e) {
-    output.textContent = "text updated";
-    inputText = input.value.split(" ");
+function changeText() {
+    stateOutput.textContent = "text updated";
+    inputText = textInput.value.split(" ");
     lines = [];
     height = ctx.measureText(inputText[0]).actualBoundingBoxAscent;
     let line = [];
@@ -64,9 +64,9 @@ function changeText(e) {
         }
     }
     if (line.length > 0) lines.push(line.join(' '));
-    textYStart = (canvas.height - lines.length * height)/(lines.length+1)
-    textSpacing = textYStart > height ? height*2 : textYStart + height;
-    textYStart = textYStart > height ? (canvas.height - (textSpacing * lines.length))/2 : textYStart;
+    textPosY = (canvas.height - lines.length * height)/(lines.length+1)
+    textSpacing = textPosY > height ? height*2 : textPosY + height;
+    textPosY = textPosY > height ? (canvas.height - (textSpacing * lines.length))/2 : textPosY;
 }
 
 function styleText() {
@@ -78,11 +78,10 @@ function styleText() {
 function drawText(stroke=false) {
     for(let i in lines) {
         if (!stroke) {
-            console.log("filling")
-            ctx.fillText(lines[i], canvas.width/2, i*(textSpacing)+textYStart + height)
+            ctx.fillText(lines[i], canvas.width/2, i*(textSpacing)+textPosY + height)
         } else {
             console.log("stroking")
-            ctx.strokeText(lines[i], canvas.width/2, i*(textSpacing)+textYStart + height)
+            ctx.strokeText(lines[i], canvas.width/2, i*(textSpacing)+textPosY + height)
         }
     }
 }
@@ -90,35 +89,35 @@ function drawText(stroke=false) {
 function writeText() {
     styleText();
     drawText();
-    output.textContent = "normal";
-    output.style.colour = "black";
-    output.style.fontWeight = "400";
+    stateOutput.textContent = "normal";
+    stateOutput.style.colour = "black";
+    stateOutput.style.fontWeight = "400";
 }
 
 function clipText() {
     state = true;
     ctx.globalCompositeOperation = "source-atop";
-    output.textContent = "clipped";
-    output.style.fontWeight = "600";
-    output.style.color = "red";
+    stateOutput.textContent = "clipped";
+    stateOutput.style.fontWeight = "600";
+    stateOutput.style.color = "red";
 
 }
 
 function writeUnderText() {
     state = true
     ctx.globalCompositeOperation = "destination-over"
-    output.textContent = "under";
-    output.style.colour = "blue";
-    output.style.fontWeight = "600";
+    stateOutput.textContent = "under";
+    stateOutput.style.colour = "blue";
+    stateOutput.style.fontWeight = "600";
     // transparency = 0.2;
 }
 
 function resetState() {
     ctx.globalCompositeOperation = "source-over";
     state = false
-    output.textContent = "normal";
-    output.style.colour = "black";
-    output.style.fontWeight = "400";
+    stateOutput.textContent = "normal";
+    stateOutput.style.colour = "black";
+    stateOutput.style.fontWeight = "400";
     transparency = 1;
 }
 
@@ -127,13 +126,30 @@ function clearCanvas() {
     resetState();
 }
 
+function previewText(fade=false, alpha=1, step = 0.01) {
+    ctx.lineWidth = 0.1;
+    ctx.setLineDash([20, 5]);
+    ctx.strokeStyle = "rgba(0,0,0,"+alpha+")";
+    clearCanvas();
+    changeText();
+    drawText(true);
+    if(fade) {
+        let requestId = requestAnimationFrame(() => {
+            previewText(fade, alpha-step);
+
+        });
+        if (alpha < step) {
+            cancelAnimationFrame(requestId)
+            updateText();
+        }
+    }
+}
+
 function getMouesPosition(e) {
     const mX = e.offsetX * canvas.width / canvas.scrollWidth | 0;
     const mY = e.offsetY * canvas.height / canvas.scrollWidth | 0;
     return {x: mX, y: mY};
 }
-
-let transparency = 1;
 
 function drawCircles(m, i) {
     let offsetX = 0;
@@ -148,12 +164,10 @@ function drawCircles(m, i) {
     ctx.fill();
 
     let requestId = requestAnimationFrame(() => {
-        setTimeout(() => {
-            drawCircles(m, i+1)
-        }, 50);
+        setTimeout(() => { drawCircles(m, i+1); }, 50);
     });
     if (i+1 >= 10) {
-        cancelAnimationFrame(requestId)
+        cancelAnimationFrame(requestId);
     }
 }
 
@@ -164,56 +178,59 @@ function getTouchPosition(e) {
     return getMouesPosition({offsetX: x, offsetY: y});
 }
 
-box.addEventListener("touchstart", (e) => {
+function updateText() {
+    clearCanvas();
+    changeText();
+    writeText();
+    clipText();
+}
+
+function inputEnd() {
+    isDrawing = false;
+}
+
+function startDraw(m) {
+    isDrawing = true;
+    lastM = m;
+    drawCircles(m, 0);
+}
+
+function continueDraw(m) {
+    const step = 100;
+    // const text = `${m.x} ${m.y}`;
+    // stateOutput.textContent = text;
+    if (isDrawing && Math.hypot(lastM.x-m.x, lastM.y-m.y) > step) {
+        lastM = m;
+        drawCircles(m, 0);
+    }
+}
+
+canvasSection.addEventListener("touchstart", (e) => {
     e.preventDefault();
-    // console.log("touch start");
-    const m = getTouchPosition(e);
-    isDrawing = true;
-    lastM = m;
-    drawCircles(m, 0);
+    startDraw(getTouchPosition(e));
 });
 
-box.addEventListener("touchmove", (e) => {
-    const m = getTouchPosition(e)
-    const step = 100;
-    const text = `${m.x} ${m.y}`;
-    output.textContent = text;
-    if (isDrawing && Math.hypot(lastM.x-m.x, lastM.y-m.y) > step) {
-        lastM = m;
-        drawCircles(m, 0);
-    }
-
+canvasSection.addEventListener("touchmove", (e) => {
+    continueDraw(getTouchPosition(e));
 });
 
-box.addEventListener("touchend", (e) => {
-    // console.log("touch end");
-    if (isDrawing) {
-        isDrawing = false;
-    }
+canvasSection.addEventListener("touchend", inputEnd);
+
+canvasSection.addEventListener("mousedown", (e) => {
+    startDraw(getMouesPosition(e));
 });
 
-box.addEventListener("mousedown", (e) => {
-    // console.log("mouse start");
-    const m = getMouesPosition(e);
-    isDrawing = true;
-    lastM = m;
-    drawCircles(m, 0);
+canvasSection.addEventListener("mousemove", (e) => {
+    continueDraw(getMouesPosition(e));
 });
 
-box.addEventListener("mousemove", (e) => {
-    const step = 100;
-    const m = getMouesPosition(e);
-    if (isDrawing && Math.hypot(lastM.x-m.x, lastM.y-m.y) > step) {
-        lastM = m;
-        drawCircles(m, 0);
-    }
-});
+canvasSection.addEventListener("mouseup", inputEnd);
 
-document.getElementById("clip").addEventListener("click", clipText);
-document.getElementById("write").addEventListener("click", writeText);
-document.getElementById("reset").addEventListener("click", resetState);
-document.getElementById("clear").addEventListener("click", clearCanvas);
-document.getElementById("under").addEventListener("click", writeUnderText);
+document.getElementById("clip-btn").addEventListener("click", clipText);
+document.getElementById("write-btn").addEventListener("click", writeText);
+document.getElementById("reset-btn").addEventListener("click", resetState);
+document.getElementById("clear-btn").addEventListener("click", clearCanvas);
+document.getElementById("under-draw-btn").addEventListener("click", writeUnderText);
 
 document.addEventListener("keypress", (e) => {
     if (e.key == "q") clearCanvas();
@@ -225,74 +242,56 @@ document.addEventListener("keypress", (e) => {
     else if (e.key == "g") randomTextColour = false;
 });
 
-box.addEventListener("mouseup", (e) => {
-    // console.log("mouse end");
-    if (isDrawing) {
-        isDrawing = false;
-    }
-});
-
 download.addEventListener('click', function (e) {
     const link = document.createElement('a');
     link.download = 'drawing.png';
     link.href = canvas.toDataURL();
     link.click();
     link.delete;
-  });
-
-
-input.addEventListener("input", (e) => {
-    output.textContent = "modifying text";
-    previewText();
 });
 
-input.addEventListener("change", (e) => {
-    clearCanvas();
-    changeText();
-    writeText();
-    clipText();
-})
-
 textSizeInput.addEventListener("input", (e) => {
-    textSizeOutput.textContent = textSizeInput.value+"px";
-    ctx.font =`bold ${textSizeOutput.textContent} rubik`;
+    textSizeLabel.textContent = textSizeInput.value+"px";
+    ctx.font =`bold ${textSizeLabel.textContent} rubik`;
     previewText();
 })
 
-function previewText() {
-    // ctx.strokeStyle = "#00000055"
-    ctx.lineWidth = 0.1;
-    ctx.setLineDash([20, 5]);
-    clearCanvas();
-    changeText();
-    drawText(true);
-}
-
 textSizeInput.addEventListener("mouseup", (e) => {
-    textSizeOutput.textContent = textSizeInput.value+"px";
-    ctx.font =`bold ${textSizeOutput.textContent} rubik`;
-    textColour = "white"
-    clearCanvas();
-    changeText();
-    writeText();
-    clipText();
+    textSizeLabel.textContent = textSizeInput.value+"px";
+    ctx.font =`bold ${textSizeLabel.textContent} rubik`;
+    textColour = "white";
+    previewText(true);
+    // updateText();
 })
 
 textSizeInput.addEventListener("touchend", (e) => {
-    textSizeOutput.textContent = textSizeInput.value+"px";
-    ctx.font =`bold ${textSizeOutput.textContent} rubik`;
-    textColour = "white"
-    clearCanvas();
-    changeText();
-    writeText();
-    clipText();
+    textSizeLabel.textContent = textSizeInput.value+"px";
+    ctx.font =`bold ${textSizeLabel.textContent} rubik`;
+    previewText(true);
+    // updateText();
 })
 
-input.addEventListener("keypress", (e) => {
-    if(e.key == "Enter") {
-        input.blur();
-    }
+textInput.addEventListener("input", (e) => {
+    stateOutput.textContent = "modifying text";
+    previewText();
+});
+
+textInput.addEventListener("change", (e) => {
+    updateText();
+})
+
+textInput.addEventListener("keypress", (e) => {
+    if(e.key == "Enter") textInput.blur();
     e.stopImmediatePropagation();
+});
+
+checkbox.addEventListener("change", (e) => {
+  console.log("checkbox", checkbox.checked, checkbox)
+  if(checkbox.checked) {
+    textInput.style.display = "block";
+  } else {
+    textInput.style.display = "none";
+  }
 });
 // let image;
 // window.addEventListener("resize", (e) => {

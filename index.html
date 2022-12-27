@@ -14,26 +14,31 @@
             <h1>Scatter Circles</h1>
         </header>
         <main>
-            <section id="canvas">
+            <section id="canvas-section">
                 <!-- <p id="instructions">left click to draw, q: clear, w: write, e:clipped, r:draw under, f:randomColour, g:white</p> -->
-                <p id="output">normal</p>
-                <canvas height="780" width="800" id="testCanvas">drawing toy</canvas>
+                <p id="state-output">normal</p>
+                <canvas height="780" width="800" id="main-canvas">drawing toy</canvas>
             </section>
-            <section id="details">
-                <button id="download">download</button>
-                <button id="write">write:W</button>
-                <button id="clip">clip:E</button>
-                <button id="under">under:R</button>
-                <button id="clear">clear:Q</button>
-                <button id="reset">reset:T</button>
+            <section id="button-section">
+                <button id="download-btn">download</button>
+                <button id="write-btn">write:W</button>
+                <button id="clip-btn">clip:E</button>
+                <button id="under-draw-btn">under:R</button>
+                <button id="clear-btn">clear:Q</button>
+                <button id="reset-btn">reset:T</button>
             </section>
-            <section id="textbox"> <h3>Settings</h3>
-                <div id="textsize">
-                    <label for="textSizeInput" id="textSizeOutput">72px</label>
-                    <input id="textSizeInput" type="range" min="24" max="150" value="72" class="slider" id="myRange">
+            <section id="text-settings"> <h3>Settings</h3>
+                <div id="text-size-container">
+                    <label for="text-size-input" id="text-size-label">72px</label>
+                    <input id="text-size-input" type="range" min="24" max="150" value="72" class="slider" id="myRange">
                 </div>
-                <textarea id="input">I will feed you when i finish coding</textarea>
+                <div id="check-box-container">
+                    <label for="checkbox" id="checkbox-label">display inputbox</label>
+                    <input id="checkbox" type="checkbox">
+                </div>
+                <textarea id="text-input">I will feed you when i finish coding</textarea>
             </section>
         </main>
+        <footer></footer>
     </body>
 </html>
